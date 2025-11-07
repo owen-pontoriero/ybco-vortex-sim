@@ -1,0 +1,19 @@
+# Virtual Environment
+venv/
+
+# Videos (Too large)
+results/videos/*.mp4
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Local Config
+configs/local_*.yaml
