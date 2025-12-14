@@ -74,7 +74,7 @@
               } else {
                 const data = await response.json();
                 if (data.error) {
-                  throw new Error(data.error);
+                  throw new Error(`Error: ${data.error}`);
                 }
                 setError('Simulation endpoint not fully configured. Check Colab notebook.');
               }
