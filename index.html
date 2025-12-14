@@ -29,11 +29,7 @@
           const [error, setError] = useState(null);
           const [gifUrl, setGifUrl] = useState(null);
           const [apiUrl, setApiUrl] = useState('');
-          const [isPlaying, setIsPlaying] = useState(true);
-          const [playbackFps, setPlaybackFps] = useState(30);
-          const canvasRef = React.useRef(null);
-          const animationRef = React.useRef(null);
-          const imageRef = React.useRef(null);
+          const [isPaused, setIsPaused] = useState(false);
 
           const handleInputChange = (field, value) => {
             setParams(prev => ({
@@ -51,6 +47,7 @@
             setLoading(true);
             setError(null);
             setGifUrl(null);
+            setIsPaused(false);
 
             try {
               const response = await fetch(`${apiUrl}/simulate`, {
@@ -103,12 +100,27 @@
           };
 
           const togglePlayPause = () => {
-            setIsPlaying(!isPlaying);
+            const img = document.getElementById('gifImage');
+            if (img) {
+              if (isPaused) {
+                // Resume: reload to continue
+                const currentSrc = img.src;
+                img.src = '';
+                img.src = currentSrc;
+              }
+              setIsPaused(!isPaused);
+            }
           };
 
           const saveSnapshot = () => {
-            if (canvasRef.current) {
-              const canvas = canvasRef.current;
+            const img = document.getElementById('gifImage');
+            if (img && isPaused) {
+              const canvas = document.createElement('canvas');
+              canvas.width = img.naturalWidth;
+              canvas.height = img.naturalHeight;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0);
+              
               canvas.toBlob((blob) => {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -121,36 +133,40 @@
           };
 
           const restartAnimation = () => {
-            if (imageRef.current) {
-              imageRef.current.src = gifUrl + '?' + new Date().getTime();
-              setIsPlaying(true);
+            const img = document.getElementById('gifImage');
+            if (img && gifUrl) {
+              setIsPaused(false);
+              img.src = '';
+              setTimeout(() => {
+                img.src = gifUrl;
+              }, 10);
             }
           };
 
           React.useEffect(() => {
-            if (!isPlaying && imageRef.current && canvasRef.current) {
-              const canvas = canvasRef.current;
-              const ctx = canvas.getContext('2d');
-              const img = imageRef.current;
-              
-              canvas.width = img.naturalWidth || img.width;
-              canvas.height = img.naturalHeight || img.height;
-              ctx.drawImage(img, 0, 0);
+            const img = document.getElementById('gifImage');
+            if (img) {
+              if (isPaused) {
+                img.style.visibility = 'hidden';
+                setTimeout(() => {
+                  img.style.visibility = 'visible';
+                }, 50);
+              }
             }
-          }, [isPlaying]);
+          }, [isPaused]);
 
           return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
+            <div className="min-h-screen p-8" style={{ background: 'linear-gradient(to bottom right, #440154, #31688e, #35b779, #fde724)' }}>
               <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-2xl shadow-xl p-8">
-                  <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                  <h1 className="text-4xl font-bold mb-2" style={{ color: '#440154' }}>
                     Flux Vortex Simulation
                   </h1>
                   <p className="text-gray-600 mb-8">
                     Simulate magnetic flux vortices in thin film superconductors
                   </p>
 
-                  <div className="mb-8 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg">
+                  <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: '#fde72420', border: '2px solid #fde724' }}>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Colab API URL (from ngrok)
                     </label>
@@ -159,7 +175,8 @@
                       value={apiUrl}
                       onChange={(e) => setApiUrl(e.target.value)}
                       placeholder="https://xxxx-xx-xxx-xxx-xxx.ngrok-free.app"
-                      className="w-full px-4 py-2 border-2 border-yellow-300 rounded-lg focus:outline-none focus:border-yellow-500"
+                      className="w-full px-4 py-2 border-2 rounded-lg focus:outline-none"
+                      style={{ borderColor: '#fde724' }}
                     />
                     <p className="text-xs text-gray-600 mt-2">
                       Copy the public URL from your running Colab notebook
@@ -168,7 +185,7 @@
 
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-6">
-                      <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+                      <h2 className="text-2xl font-semibold mb-4" style={{ color: '#31688e' }}>
                         Simulation Parameters
                       </h2>
 
@@ -193,7 +210,8 @@
                             step="0.0001"
                             value={params.timestep}
                             onChange={(e) => handleInputChange('timestep', e.target.value)}
-                            className="w-24 px-2 py-1 border-2 border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
+                            className="w-24 px-2 py-1 border-2 border-gray-300 rounded focus:outline-none text-sm"
+                            style={{ borderColor: '#35b779' }}
                           />
                         </div>
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -223,13 +241,30 @@
                             step="0.01"
                             value={params.magneticField}
                             onChange={(e) => handleInputChange('magneticField', e.target.value)}
-                            className="w-24 px-2 py-1 border-2 border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
+                            className="w-24 px-2 py-1 border-2 border-gray-300 rounded focus:outline-none text-sm"
+                            style={{ borderColor: '#35b779' }}
                           />
                         </div>
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
                           <span>0</span>
                           <span>0.5</span>
                         </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Resolution: {params.resolution}x{params.resolution}
+                        </label>
+                        <select
+                          value={params.resolution}
+                          onChange={(e) => handleInputChange('resolution', e.target.value)}
+                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none"
+                        >
+                          <option value="50">50x50</option>
+                          <option value="100">100x100</option>
+                          <option value="150">150x150</option>
+                          <option value="200">200x200</option>
+                        </select>
                       </div>
 
                       <div>
@@ -243,7 +278,7 @@
                           step="1000"
                           value={params.numTimesteps}
                           onChange={(e) => handleInputChange('numTimesteps', e.target.value)}
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none"
                         />
                       </div>
 
@@ -258,24 +293,8 @@
                           step="5"
                           value={params.gifFps}
                           onChange={(e) => handleInputChange('gifFps', e.target.value)}
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none"
                         />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Resolution: {params.resolution}x{params.resolution}
-                        </label>
-                        <select
-                          value={params.resolution}
-                          onChange={(e) => handleInputChange('resolution', e.target.value)}
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                        >
-                          <option value="50">50x50</option>
-                          <option value="100">100x100</option>
-                          <option value="150">150x150</option>
-                          <option value="200">200x200</option>
-                        </select>
                       </div>
 
                       <div className="flex items-center space-x-3">
@@ -284,7 +303,8 @@
                           id="seedVortices"
                           checked={params.seedVortices}
                           onChange={(e) => handleInputChange('seedVortices', e.target.checked)}
-                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-5 h-5 border-gray-300 rounded"
+                          style={{ accentColor: '#440154' }}
                         />
                         <label htmlFor="seedVortices" className="text-sm font-medium text-gray-700">
                           Seed initial vortices
@@ -294,48 +314,33 @@
                       <button
                         onClick={runSimulation}
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 overflow-hidden relative"
+                        className="w-full text-white font-semibold py-4 px-6 rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{ backgroundColor: loading ? '#888' : '#440154' }}
                       >
-                        {loading ? (
-                          <div className="w-full relative h-8">
-                            <div className="absolute inset-0 bg-blue-800 rounded-full overflow-hidden">
-                              <div className="absolute h-full w-1/3 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-[slide_2s_ease-in-out_infinite]"></div>
-                            </div>
-                            <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold">
-                              Simulation running...
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <span className="mr-2">▶</span>
-                            <span>Run Simulation</span>
-                          </>
-                        )}
+                        Run Simulation
                       </button>
-
-                      <style>{`
-                        @keyframes slide {
-                          0% { left: -33%; }
-                          100% { left: 100%; }
-                        }
-                      `}</style>
-
-                      {loading && (
-                        <p className="text-sm text-gray-600 text-center">
-                          This may take 2-3 minutes depending on parameters...
-                        </p>
-                      )}
                     </div>
 
                     <div className="flex flex-col">
-                      <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+                      <h2 className="text-2xl font-semibold mb-4" style={{ color: '#31688e' }}>
                         Results
                       </h2>
                       
                       <div className="flex-1 bg-gray-50 rounded-lg border-2 border-gray-200 flex items-center justify-center p-4 min-h-[400px]">
-                        {error ? (
+                        {loading ? (
+                          <div className="text-center space-y-4">
+                            <div className="inline-block">
+                              <svg className="animate-spin h-16 w-16" style={{ color: '#440154' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                            </div>
+                            <p className="text-sm font-medium" style={{ color: '#440154' }}>Simulation running...</p>
+                            <p className="text-xs text-gray-600">This may take 2-3 minutes depending on parameters</p>
+                          </div>
+                        ) : error ? (
                           <div className="text-center text-red-600 space-y-2">
-                            <div className="text-6xl">⚠️</div>
+                            <div className="text-6xl">!</div>
                             <p className="font-medium">Error</p>
                             <p className="text-sm">{error}</p>
                           </div>
@@ -343,47 +348,53 @@
                           <div className="space-y-4 w-full">
                             <div className="relative">
                               <img 
-                                ref={imageRef}
+                                id="gifImage"
                                 src={gifUrl} 
                                 alt="Simulation result" 
                                 className="w-full rounded-lg shadow-lg"
-                                style={{ display: isPlaying ? 'block' : 'none' }}
+                                style={{ display: isPaused ? 'none' : 'block' }}
                               />
-                              <canvas
-                                ref={canvasRef}
-                                className="w-full rounded-lg shadow-lg"
-                                style={{ display: !isPlaying ? 'block' : 'none' }}
-                              />
+                              {isPaused && (
+                                <img 
+                                  src={gifUrl}
+                                  alt="Paused frame"
+                                  className="w-full rounded-lg shadow-lg"
+                                />
+                              )}
                             </div>
                             
                             <div className="bg-gray-100 rounded-lg p-4 space-y-3">
-                              <div className="flex gap-2">
+                              <div className="grid grid-cols-3 gap-2">
                                 <button
                                   onClick={togglePlayPause}
-                                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                  className="text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                  style={{ backgroundColor: '#440154' }}
                                 >
-                                  {isPlaying ? '⏸ Pause' : '▶ Play'}
+                                  {isPaused ? 'Play' : 'Pause'}
                                 </button>
                                 <button
                                   onClick={saveSnapshot}
-                                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                                  disabled={isPlaying}
+                                  className="text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  style={{ backgroundColor: '#31688e' }}
+                                  disabled={!isPaused}
                                 >
-                                  📷 Save Snapshot
+                                  Save Snapshot
                                 </button>
                                 <button
                                   onClick={restartAnimation}
-                                  className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                  className="text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                  style={{ backgroundColor: '#35b779' }}
                                 >
-                                  🔄 Restart
+                                  Restart
                                 </button>
                               </div>
                               
                               <button
                                 onClick={downloadGif}
-                                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                className="w-full text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                style={{ backgroundColor: '#fde724', color: '#333' }}
                               >
-                                ⬇️ Download GIF
+                                Download GIF
                               </button>
                             </div>
                           </div>
@@ -399,9 +410,9 @@
                     </div>
                   </div>
 
-                  <div className="mt-8 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
-                    <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
-                    <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                  <div className="mt-8 p-4 rounded-lg" style={{ backgroundColor: '#31688e20', border: '2px solid #31688e' }}>
+                    <h3 className="font-semibold mb-2" style={{ color: '#31688e' }}>How to use:</h3>
+                    <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
                       <li>Start your Colab notebook with the simulation code</li>
                       <li>Copy the ngrok public URL from the Colab output</li>
                       <li>Paste it in the "Colab API URL" field above</li>
