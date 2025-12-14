@@ -62,7 +62,7 @@
               });
 
               if (!response.ok) {
-                throw new Error(`Simulation failed: ${response.statusText}`);
+                throw new Error(`Simulation failed: ${response.error}`);
               }
 
               const contentType = response.headers.get('content-type');
@@ -133,8 +133,8 @@
                         </label>
                         <input
                           type="range"
-                          min="0.001"
-                          max="0.01"
+                          min="0.002"
+                          max="0.005"
                           step="0.0001"
                           value={params.timestep}
                           onChange={(e) => handleInputChange('timestep', e.target.value)}
