@@ -97,33 +97,6 @@
             }
           };
 
-          const saveSnapshot = () => {
-            const img = document.getElementById('gifImage');
-            if (img) {
-              const canvas = document.createElement('canvas');
-              canvas.width = img.naturalWidth || img.width;
-              canvas.height = img.naturalHeight || img.height;
-              const ctx = canvas.getContext('2d');
-              ctx.drawImage(img, 0, 0);
-              
-              canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'snapshot.png';
-                a.click();
-                URL.revokeObjectURL(url);
-              });
-            }
-          };
-
-          const restartAnimation = () => {
-            const img = document.getElementById('gifImage');
-            if (img && gifUrl) {
-              img.src = gifUrl + '?t=' + Date.now();
-            }
-          };
-
           React.useEffect(() => {
             // Cleanup
             return () => {
@@ -337,35 +310,14 @@
                               />
                             </div>
                             
-                            <div className="bg-gray-100 rounded-lg p-4 space-y-3">
-                              <div className="grid grid-cols-2 gap-2">
-                                <button
-                                  onClick={saveSnapshot}
-                                  className="text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                                  style={{ backgroundColor: '#31688e' }}
-                                >
-                                  Save Snapshot
-                                </button>
-                                <button
-                                  onClick={restartAnimation}
-                                  className="text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-                                  style={{ backgroundColor: '#440154' }}
-                                >
-                                  Restart
-                                </button>
-                              </div>
-                              
+                            <div className="bg-gray-100 rounded-lg p-4">
                               <button
                                 onClick={downloadGif}
-                                className="w-full text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                                className="w-full text-white font-semibold py-3 px-4 rounded-lg transition-colors"
                                 style={{ backgroundColor: '#35b779' }}
                               >
                                 Download GIF
                               </button>
-                              
-                              <p className="text-xs text-gray-600 text-center italic">
-                                Note: Snapshot captures whatever frame is currently visible
-                              </p>
                             </div>
                           </div>
                         ) : (
