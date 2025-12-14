@@ -17,9 +17,9 @@
 
         function SuperconductorSimulator() {
           const [params, setParams] = useState({
-            timestep: 0.005,
-            magneticField: 0.5,
-            resolution: 128,
+            timestep: 0.003,
+            magneticField: 0.25,
+            resolution: 100,
             numTimesteps: 20000,
             seedVortices: false
           });
@@ -62,13 +62,7 @@
               });
 
               if (!response.ok) {
-                const data = await response.json();
-                let errorStr = "";
-                if (data.error) {
-                    errorStr += " - ";
-                    errorStr += data.error;
-                }
-                throw new Error(`Simulation failed!${errorStr}`);
+                throw new Error(`Simulation failed: ${response.statusText}`);
               }
 
               const contentType = response.headers.get('content-type');
@@ -80,7 +74,7 @@
               } else {
                 const data = await response.json();
                 if (data.error) {
-                  throw new Error(`Error: ${data.error}`);
+                  throw new Error(data.error);
                 }
                 setError('Simulation endpoint not fully configured. Check Colab notebook.');
               }
@@ -137,15 +131,26 @@
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Timestep: {params.timestep}
                         </label>
-                        <input
-                          type="range"
-                          min="0.002"
-                          max="0.005"
-                          step="0.0001"
-                          value={params.timestep}
-                          onChange={(e) => handleInputChange('timestep', e.target.value)}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        />
+                        <div className="flex gap-3 items-center">
+                          <input
+                            type="range"
+                            min="0.002"
+                            max="0.005"
+                            step="0.0001"
+                            value={params.timestep}
+                            onChange={(e) => handleInputChange('timestep', e.target.value)}
+                            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          />
+                          <input
+                            type="number"
+                            min="0.002"
+                            max="0.005"
+                            step="0.0001"
+                            value={params.timestep}
+                            onChange={(e) => handleInputChange('timestep', e.target.value)}
+                            className="w-24 px-2 py-1 border-2 border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
+                          />
+                        </div>
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
                           <span>0.002</span>
                           <span>0.005</span>
@@ -156,15 +161,26 @@
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           External Magnetic Field: {params.magneticField}
                         </label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="0.5"
-                          step="0.01"
-                          value={params.magneticField}
-                          onChange={(e) => handleInputChange('magneticField', e.target.value)}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        />
+                        <div className="flex gap-3 items-center">
+                          <input
+                            type="range"
+                            min="0"
+                            max="0.5"
+                            step="0.01"
+                            value={params.magneticField}
+                            onChange={(e) => handleInputChange('magneticField', e.target.value)}
+                            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            max="0.5"
+                            step="0.01"
+                            value={params.magneticField}
+                            onChange={(e) => handleInputChange('magneticField', e.target.value)}
+                            className="w-24 px-2 py-1 border-2 border-gray-300 rounded focus:outline-none focus:border-blue-500 text-sm"
+                          />
+                        </div>
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
                           <span>0</span>
                           <span>0.5</span>
@@ -195,10 +211,10 @@
                           onChange={(e) => handleInputChange('resolution', e.target.value)}
                           className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                         >
-                          <option value="64">64x64 (Fast)</option>
-                          <option value="128">128x128 (Medium)</option>
-                          <option value="256">256x256 (High)</option>
-                          <option value="512">512x512 (Very High)</option>
+                          <option value="50">50x50</option>
+                          <option value="100">100x100</option>
+                          <option value="150">150x150</option>
+                          <option value="200">200x200</option>
                         </select>
                       </div>
 
