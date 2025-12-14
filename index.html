@@ -62,7 +62,7 @@
               });
 
               if (!response.ok) {
-                throw new Error(`Simulation failed: ${response.error}`);
+                throw new Error(`Simulation failed!`);
               }
 
               const contentType = response.headers.get('content-type');
@@ -141,8 +141,8 @@
                           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                         />
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
-                          <span>0.001</span>
-                          <span>0.01</span>
+                          <span>0.002</span>
+                          <span>0.005</span>
                         </div>
                       </div>
 
@@ -153,7 +153,7 @@
                         <input
                           type="range"
                           min="0"
-                          max="1"
+                          max="0.5"
                           step="0.01"
                           value={params.magneticField}
                           onChange={(e) => handleInputChange('magneticField', e.target.value)}
@@ -161,7 +161,7 @@
                         />
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
                           <span>0</span>
-                          <span>1</span>
+                          <span>0.5</span>
                         </div>
                       </div>
 
