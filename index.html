@@ -8,14 +8,12 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
 <body>
     <div id="root"></div>
     
     <script type="text/babel">
         const { useState } = React;
-        const { Play, Download, Loader2, AlertCircle } = lucide;
 
         function SuperconductorSimulator() {
           const [params, setParams] = useState({
@@ -201,12 +199,12 @@
                       >
                         {loading ? (
                           <>
-                            <Loader2 className="animate-spin" size={20} />
+                            <span className="inline-block animate-spin mr-2">⏳</span>
                             <span>Running Simulation...</span>
                           </>
                         ) : (
                           <>
-                            <Play size={20} />
+                            <span className="mr-2">▶</span>
                             <span>Run Simulation</span>
                           </>
                         )}
@@ -227,7 +225,7 @@
                       <div className="flex-1 bg-gray-50 rounded-lg border-2 border-gray-200 flex items-center justify-center p-4 min-h-[400px]">
                         {error ? (
                           <div className="text-center text-red-600 space-y-2">
-                            <AlertCircle size={48} className="mx-auto" />
+                            <div className="text-6xl">⚠️</div>
                             <p className="font-medium">Error</p>
                             <p className="text-sm">{error}</p>
                           </div>
@@ -242,8 +240,7 @@
                               onClick={downloadGif}
                               className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
                             >
-                              <Download size={20} />
-                              <span>Download GIF</span>
+                              <span>⬇️ Download GIF</span>
                             </button>
                           </div>
                         ) : (
@@ -274,7 +271,8 @@
           );
         }
 
-        ReactDOM.render(<SuperconductorSimulator />, document.getElementById('root'));
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SuperconductorSimulator />);
     </script>
 </body>
 </html>
