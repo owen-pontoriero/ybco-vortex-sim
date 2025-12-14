@@ -62,11 +62,13 @@
               });
 
               if (!response.ok) {
-                let responseStr = "";
-                for (const key in response) {
-                    responseStr += `${key}: ${response[key]}\n`
+                const data = await response.json();
+                let errorStr = "";
+                if (data.error) {
+                    errorStr += " - ";
+                    errorStr += data.error;
                 }
-                throw new Error(`Simulation failed!\n${responseStr}`);
+                throw new Error(`Simulation failed!${errorStr}`);
               }
 
               const contentType = response.headers.get('content-type');
