@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flux Vortex Simulation</title>
+    <title>Superconductor Flux Vortex Simulation</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -326,16 +326,26 @@
 
                   <div className="mt-8 p-4 rounded-lg" style={{ backgroundColor: '#31688e20', border: '2px solid #31688e' }}>
                     <h3 className="font-semibold mb-2" style={{ color: '#31688e' }}>How to use:</h3>
-                    <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
-                      <li>Make a copy of <a href="https://colab.research.google.com/drive/1wiu2tS9ZFD4e1xlNmjfcMt0DxNMqKZE2?usp=sharing">this colab notebook</a>.</li>
-                      <li>If you don't have an ngrok account, go to <a href="https://ngrok.com/">ngrok.com</a> and create one.</li> 
-                      <li>Go to <a href="https://dashboard.ngrok.com/get-started/your-authtoken">this page</a> to copy your ngrok authtoken.</li>
+                    <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside instructions-list">
+                      <li>Make a copy of <a href="https://colab.research.google.com/drive/1wiu2tS9ZFD4e1xlNmjfcMt0DxNMqKZE2?usp=sharing" target="_blank" rel="noopener noreferrer">this colab notebook</a>.</li>
+                      <li>If you don't have an ngrok account, go to <a href="https://ngrok.com/" target="_blank" rel="noopener noreferrer">ngrok.com</a> and create one.</li>
+                      <li>Go to <a href="https://dashboard.ngrok.com/get-started/your-authtoken" target="_blank" rel="noopener noreferrer">this page</a> to copy your ngrok authtoken.</li>
                       <li>Paste your authtoken into the colab notebook, and run the cell.</li>
                       <li>Copy the ngrok-free.dev link and paste it into the textbox at the top of this page.</li>
                       <li>Change simulation parameters! Be aware that some simulation parameters will cause the simulation to become instable, or take longer to run.</li>
                       <li>Click "Run Simulation" and wait for results!</li>
                     </ol>
                   </div>
+
+                  <style>{`
+                    .instructions-list a {
+                      color: #31688e;
+                      transition: all 0.2s;
+                    }
+                    .instructions-list a:hover {
+                      text-decoration: underline;
+                    }
+                  `}</style>
                 </div>
               </div>
             </div>
